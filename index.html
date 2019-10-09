@@ -3,8 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <title>样品展示</title>
+    <!-- jquery -->
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <!-- fontawesome字体库 -->
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        img {
+            height: 75vh;
+        }
+
+        .fa {
+            font-size: 10vh;
+        }
+
+        .swiper {
+            width: 75vw;
+            margin: 0 auto;
+            vertical-align: middle;
+            position: relative;
+            overflow-x: scroll;
+            overflow-y: hidden;
+        }
+
+        .swiper-container {
+            position: relative;
+            left: 0%;
+            width: 300%; /* 三种图片为300% */
+            height: 100%;
+            display: flex;
+            /* 动画效果 */
+            transition: left 0.4s ease-in-out;
+        }
+
+        .swiper-item {
+            width: calc(100% / 3);
+        }
+
+        ::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
+        .butLeftCls {
+            position: absolute;
+            top: 35vh;
+            left: 0.5vw;
+            color: #fff;
+        }
+
+        .butRightCls {
+            position: absolute;
+            top: 35vh;
+            right: 0.5vw;
+            color: #fff;
+        }
+
+        .spot {
+            padding: 1% 0;
+            display: flex;
+            text-align: center;
+            height: 30px;
+            background-color: #fbfbfb;
+            color: #848484;
+        }
+
+        .spot_01 {
+            flex: 1;
+        }
+
+        /* 选中后的字体颜色 */
+        .colCls {
+            color: #e61673;
+        }
+
+        .colCls:after {
+            content: '';
+            height: 5px;
+            margin: 0 auto;
+            width: 20%;
+            position: relative;
+            bottom: -50%;
+            background-color: #e61673;
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <h1>李承堂</h1>
+<div class="swiper">
+    <div class="swiper-container">
+        <img class="swiper-item" src="banner_1.jpg" ondragstart="return false;">
+        <img class="swiper-item" src="banner_2.jpg" ondragstart="return false;">
+        <img class="swiper-item" src="banner_3.jpg" ondragstart="return false;">
+    </div>
+    <div class="butLeftCls" onClick='leftFun()'><i class="fa fa-angle-left"></i></div>
+    <div class="butRightCls" onClick='rightFun()'><i class="fa fa-angle-right"></i></div>
+    <div class="spot">
+        <div class="spot_01 colCls">第1张</div>
+        <div class="spot_01">第2张</div>
+        <div class="spot_01">第3张</div>
+    </div>
+</div>
+<script th:inline="javascript">
+    $(document).ready(function () {
+        setTimeout('rightFun()', 2000);
+        // 加载按钮id
+        setID();
+    });
+    var circleIndex = 0;
+
+    function setID() {
+        // 设置展开按钮id
+        var circleList = document.getElementsByClassName('spot_01');
+        for (var i = 0; i < circleList.length; i++) {
+            circleList[i].onclick = function () {
+                arrowBack(this);
+            };
+            circleList[i].id = ('id', 'seeID_' + i);
+            circleIndex++;
+        }
+    }
+
+    // 根据按钮下标切换图片
+    function arrowBack(that) {
+        for (var i = 0; i < circleIndex; i++) {
+            if (that.id == 'seeID_' + i) {
+                $(that).addClass('colCls');
+
+                $('.swiper-container').css('left', -i * 100 + '%')
+
+                spotNum = i;
+                leftDistance = -i * 100;
+                // 如下为一个图片配置一次
+                // if (i == 0) { // 第一张图片
+                //     $('.swiper-container').css('left','0')
+                //     leftDistance = 0
+                // }
+                // if (i == 1) { // 第二张图片
+                //     $('.swiper-container').css('left','-100%')
+                //     leftDistance = -100
+                // }
+                // if (i == 2) { // 第三张图片
+                //     $('.swiper-container').css('left','-200%')
+                //     leftDistance = -200
+                // }
+                // spotNum = i
+            } else if (that.id != 'seeID_' + i) {
+                $('#seeID_' + i).removeClass('colCls');
+            }
+        }
+    }
+
+    var leftDistance = 0; // 滑动的left
+    var spotNum = 0;
+    var spotList = $('.spot_01').length;
+
+    function leftFun() {
+        if (leftDistance == 0) {
+            // 三张图片 -200%
+            $('.swiper-container').css('left', '-200%');
+            leftDistance = -200;
+            spotNum = spotList - 1;
+        } else {
+            spotNum--;
+            leftDistance += 100;
+            $('.swiper-container').css('left', leftDistance + '%');
+        }
+        for (var i = 0; i < spotList; i++) {
+            if (i == spotNum) {
+                $('#seeID_' + i).addClass('colCls');
+            } else {
+                $('#seeID_' + i).removeClass('colCls');
+            }
+        }
+    }
+
+    var interval;
+
+    function rightFun() {
+
+        clearInterval(interval);
+
+        // -200 三张图片
+        if (leftDistance == -200) {
+            leftDistance = 0;
+            spotNum = 0;
+            $('.swiper-container').css('left', '0%');
+        } else {
+            spotNum++
+            leftDistance -= 100;
+            $('.swiper-container').css('left', leftDistance + '%')
+        }
+
+        if (spotNum >= spotList) {
+            spotNum = 0
+        }
+        for (var i = 0; i < spotList; i++) {
+            if (i == spotNum) {
+                $('#seeID_' + i).addClass('colCls');
+            } else {
+                $('#seeID_' + i).removeClass('colCls');
+            }
+        }
+
+        interval = setInterval('rightFun()', 2000);
+    }
+</script>
 </body>
 </html>
